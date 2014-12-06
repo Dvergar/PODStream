@@ -18,39 +18,44 @@ class SerializerMacro
 
     static public function getSerialized():Array<String>
     {
-        trace("arrserialized " + serialized);
-        trace("serialized " + haxe.Resource.getString("serialized"));
+        trace("Serialized components: " + haxe.Resource.getString("serialized"));
 
         var serializedSerialized:String = haxe.Resource.getString("serialized");
+        // TODO: Care about case where empty
         // if(serializedSerialized == null)
         //     serializedSerialized = [];
         return haxe.Unserializer.run(serializedSerialized);
     }
 
     #if macro
-    static public function _build(fields:Array<Field>):Array<Field>
+    static public function _build(fields:Array<Field>, ?componentName:String):Array<Field>
     {
         var cls = Context.getLocalClass().get();
         var pos = Context.currentPos();
 
-        var componentName = cls.name;
+        // CONTEXT MIGHT NOT ALWAYS GIVE YOU THE RIGHT COMPONENT NAME
+        // YOU CAN PASS THE COMPONENT NAME IN THAT CASE
+        var componentName = componentName;
+        if(componentName == null) componentName = cls.name;
+
         trace("component " + componentName);
 
         // PROCESS EACH PARAMETER AND SAVE IT UP
         var networkVariables:Array<NetworkVariable> = new Array();
         for(f in fields)
         {
+            trace("fff" + f);
             if(f.meta.length != 0)
             {
                 // META NET TYPES (can't be above because typemeta related to msgtypesmetas)
                 for(m in f.meta)
                 {
-                    if(m.name == "short" ||
-                       m.name == "int" ||
-                       m.name == "float" ||
-                       m.name == "bool" ||
-                       m.name == "byte" ||
-                       m.name == "string")
+                    if(m.name == "Short" ||
+                       m.name == "Int" ||
+                       m.name == "Float" ||
+                       m.name == "Bool" ||
+                       m.name == "Byte" ||
+                       m.name == "String")
                     {
                         trace("m " + m);
                         var netVar:NetworkVariable = {name:f.name,
@@ -85,6 +90,20 @@ class SerializerMacro
             Context.addResource("serialized", haxe.io.Bytes.ofString(haxe.Serializer.run(serialized)));
         });
         
+        // ASSIGN ID
+        var id = getComponentId();
+
+        // ADDS ID TO OBJECT & CLASS
+        trace("id assigned " + id);
+        fields.push({kind: FVar(TPath({name: "Int", pack: [], params: [] }),
+                                      {expr: EConst(CInt(Std.string(id))), pos : pos }),
+                     meta: [], name: "_id", doc: null, pos: pos, access: [APublic] });
+
+        fields.push({kind: FVar(TPath({name: "Int", pack: [], params: [] }),
+                                      {expr: EConst(CInt(Std.string(id))), pos : pos }),
+                     meta: [], name: "__id", doc: null, pos: pos, access: [APublic, AStatic] });
+
+        
         if(networkVariables.length == 0)
         {
             trace("No serialization, abort");
@@ -96,17 +115,6 @@ class SerializerMacro
         // RETURN HERE PLEASE DONT FORGET HIM :'('
         ////////////////////////////////////////
 
-        // ASSIGN ID
-        var id = getComponentId();
-
-        // ADDS ID TO OBJECT & CLASS
-        fields.push({kind: FVar(TPath({name: "Int", pack: [], params: [] }),
-                                      {expr: EConst(CInt(Std.string(id))), pos : pos }),
-                     meta: [], name: "_sid", doc: null, pos: pos, access: [APublic] });
-
-        fields.push({kind: FVar(TPath({name: "Int", pack: [], params: [] }),
-                                      {expr: EConst(CInt(Std.string(id))), pos : pos }),
-                     meta: [], name: "__sid", doc: null, pos: pos, access: [APublic, AStatic] });
 
         // ADD COMPONENT TO ARRAY
         serialized.push(componentName);
@@ -132,22 +140,22 @@ class SerializerMacro
 
             switch(varType)
             {
-                case "short":
+                case "Short":
                     outExprlist.push( macro bo.writeInt16(Std.int($i{varNameOut})) );
                     inExprlist.push( macro $i{varNameIn} = bi.readInt16() );
-                case "int":
+                case "Int":
                     outExprlist.push( macro bo.writeInt32(Std.int($i{varNameOut})) );
                     inExprlist.push( macro $i{varNameIn} = bi.readInt32() );
-                case "byte":
+                case "Byte":
                     outExprlist.push( macro bo.writeByte(Std.int($i{varNameOut})) );
                     inExprlist.push( macro $i{varNameIn} = bi.readByte() );
-                case "float":
+                case "Float":
                     outExprlist.push( macro bo.writeFloat($i{varNameOut}) );
                     inExprlist.push( macro $i{varNameIn} = bi.readFloat() );
-                case "bool":
+                case "Bool":
                     outExprlist.push( macro ($i{varNameOut} == true) ? bo.writeByte(1) : bo.writeByte(0) );
                     inExprlist.push( macro $i{varNameIn} = (bi.readByte() == 0) ? return false : return true );
-                case "string":
+                case "String":
                     outExprlist.push( macro bo.writeInt16($i{varNameOut}.length) );
                     outExprlist.push( macro bo.writeString($i{varNameOut}) );
                     inExprlist.push( macro $i{varNameIn} = bi.readString(bi.readInt16()) );
@@ -187,7 +195,9 @@ class SerializerMacro
         for(f in fields)
         {
             trace("Serialized : " + new haxe.macro.Printer().printField(f));
+            // trace(f);
         }
+
 
         return fields;
     }
