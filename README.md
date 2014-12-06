@@ -9,8 +9,8 @@ Given a position component such as:
 @:build(podstream.SerializerMacro.build())
 class CPosition
 {
-    @short public var x:Float;
-    @short public var y:Float;
+    @Short public var x:Float;
+    @Short public var y:Float;
 
     public function new(x:Float, y:Float)
     {
@@ -21,12 +21,12 @@ class CPosition
 ```
 
 You can prefix your fields with:
-* `@short`
-* `@int`
-* `@float`
-* `@bool`
-* `@byte`
-* `@string`
+* `@Short`
+* `@Int`
+* `@Float`
+* `@Bool`
+* `@Byte`
+* `@String`
 
 Note: Arrays are not supported.
 
