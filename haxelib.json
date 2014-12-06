@@ -1,0 +1,11 @@
+{
+	"name": "podstream",
+	"url": "https://github.com/Dvergar/PODStream",
+	"license": "BSD",
+	"tags": ["pod", "serialization"],
+	"description": "A POD serializer",
+	"version": "0.0.2",
+	"releasenote": "FIXED bad packaging",
+	"contributors": [ "caribou" ],
+	"dependencies": {}
+}
