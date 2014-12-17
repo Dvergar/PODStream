@@ -8,12 +8,19 @@ typedef NetworkVariable = {name:String, type:String, redirection:String};
 class SerializerMacro
 {
     static public var componentIds:Int = -1;
+    static public var componentSerializeIds:Int = -1;
     static public var serialized:Array<String> = new Array();
 
     static inline function getComponentId():Int
     {
         componentIds++;
         return componentIds;
+    }
+
+    static inline function getComponentSerializedId():Int
+    {
+        componentSerializeIds++;
+        return componentSerializeIds;
     }
 
     static public function getSerialized():Array<String>
@@ -83,12 +90,6 @@ class SerializerMacro
                 }
             }
         }
-
-        haxe.macro.Context.onGenerate(function(types)
-        {
-            trace("onGenerate " + haxe.io.Bytes.ofString(haxe.Serializer.run(serialized)));
-            Context.addResource("serialized", haxe.io.Bytes.ofString(haxe.Serializer.run(serialized)));
-        });
         
         // ASSIGN ID
         var id = getComponentId();
@@ -106,7 +107,7 @@ class SerializerMacro
         
         if(networkVariables.length == 0)
         {
-            trace("No serialization, abort");
+            trace('No serialization for $componentName, abort');
             return fields;
         }
 
@@ -115,9 +116,26 @@ class SerializerMacro
         // RETURN HERE PLEASE DONT FORGET HIM :'('
         ////////////////////////////////////////
 
+        haxe.macro.Context.onGenerate(function(types)
+        {
+            trace("onGenerate " + haxe.io.Bytes.ofString(haxe.Serializer.run(serialized)));
+            Context.addResource("serialized", haxe.io.Bytes.ofString(haxe.Serializer.run(serialized)));
+        });
+
+        // ADDS ID TO __ SERIALIZED __ OBJECT & CLASS
+        var sid = getComponentSerializedId();
+        fields.push({kind: FVar(TPath({name: "Int", pack: [], params: [] }),
+                                      {expr: EConst(CInt(Std.string(sid))), pos : pos }),
+                     meta: [], name: "_sid", doc: null, pos: pos, access: [APublic] });
+
+        fields.push({kind: FVar(TPath({name: "Int", pack: [], params: [] }),
+                                      {expr: EConst(CInt(Std.string(sid))), pos : pos }),
+                     meta: [], name: "__sid", doc: null, pos: pos, access: [APublic, AStatic] });
+
 
         // ADD COMPONENT TO ARRAY
         serialized.push(componentName);
+        // serialized[id] = componentName;
         trace("hum : " + SerializerMacro.serialized);
 
         trace("networkVariables " + networkVariables);
@@ -137,6 +155,9 @@ class SerializerMacro
 
             trace("varType " + varType);
             trace("varName " + varNameIn + " / " + varNameOut);
+
+            inExprlist.push( macro trace("unserializing " + $v{componentName}) );
+            inExprlist.push( macro trace(bi) );
 
             switch(varType)
             {
@@ -160,6 +181,7 @@ class SerializerMacro
                     outExprlist.push( macro bo.writeString($i{varNameOut}) );
                     inExprlist.push( macro $i{varNameIn} = bi.readString(bi.readInt16()) );
             }
+            inExprlist.push( macro trace("hep") );
         }
 
         // IN
