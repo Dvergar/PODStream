@@ -156,9 +156,6 @@ class SerializerMacro
             trace("varType " + varType);
             trace("varName " + varNameIn + " / " + varNameOut);
 
-            inExprlist.push( macro trace("unserializing " + $v{componentName}) );
-            inExprlist.push( macro trace(bi) );
-
             switch(varType)
             {
                 case "Short":
@@ -181,7 +178,6 @@ class SerializerMacro
                     outExprlist.push( macro bo.writeString($i{varNameOut}) );
                     inExprlist.push( macro $i{varNameIn} = bi.readString(bi.readInt16()) );
             }
-            inExprlist.push( macro trace("hep") );
         }
 
         // IN
