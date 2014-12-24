@@ -51,7 +51,6 @@ class SerializerMacro
         var networkVariables:Array<NetworkVariable> = new Array();
         for(f in fields)
         {
-            trace("fff" + f);
             if(f.meta.length != 0)
             {
                 // META NET TYPES (can't be above because typemeta related to msgtypesmetas)
