@@ -7,7 +7,7 @@ Given a position component such as:
 
 ```Haxe
 @:build(podstream.SerializerMacro.build())
-class CPosition
+class Position
 {
     @Short public var x:Float;
     @Short public var y:Float;
@@ -33,7 +33,7 @@ Note: Arrays are not supported.
 In the example above the haxe macro will generate two methods which will transform your component to:
 
 ```Haxe
-class CPosition
+class Position
 {
     public var x:Float;
     public var y:Float;
