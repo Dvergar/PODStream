@@ -25,8 +25,6 @@ class SerializerMacro
 
     static public function getSerialized():Array<String>
     {
-        trace("Serialized components: " + haxe.Resource.getString("serialized"));
-
         var serializedSerialized:String = haxe.Resource.getString("serialized");
         // TODO: Care about case where empty
         // if(serializedSerialized == null)
@@ -45,7 +43,7 @@ class SerializerMacro
         var componentName = componentName;
         if(componentName == null) componentName = cls.name;
 
-        trace("component " + componentName);
+        #if debug trace("### PodStream Serialization: " + componentName + " ###"); #end
 
         // PROCESS EACH PARAMETER AND SAVE IT UP
         var networkVariables:Array<NetworkVariable> = new Array();
@@ -63,18 +61,15 @@ class SerializerMacro
                        m.name == "Byte" ||
                        m.name == "String")
                     {
-                        trace("m " + m);
                         var netVar:NetworkVariable = {name:f.name,
                                                       type:m.name,
                                                       redirection:null};
 
                         if(m.params.length != 0)
                         {
-                            trace("param " + m.params[0].expr);
                             switch(m.params[0].expr)
                             {
                                 case EConst(CString(redirection)):
-                                    trace("redirection " + redirection);
                                     netVar.redirection = redirection;
                                 case _:
                             }
@@ -94,7 +89,7 @@ class SerializerMacro
         var id = getComponentId();
 
         // ADDS ID TO OBJECT & CLASS
-        trace("id assigned " + id);
+        #if debug trace("ID assigned: " + id); #end
         fields.push({kind: FVar(TPath({name: "Int", pack: [], params: [] }),
                                       {expr: EConst(CInt(Std.string(id))), pos : pos }),
                      meta: [], name: "_id", doc: null, pos: pos, access: [APublic] });
@@ -106,7 +101,7 @@ class SerializerMacro
         
         if(networkVariables.length == 0)
         {
-            trace('No serialization for $componentName, abort');
+            #if debug trace('No serialization for $componentName, abort'); #end
             return fields;
         }
 
@@ -117,7 +112,6 @@ class SerializerMacro
 
         haxe.macro.Context.onGenerate(function(types)
         {
-            trace("onGenerate " + haxe.io.Bytes.ofString(haxe.Serializer.run(serialized)));
             Context.addResource("serialized", haxe.io.Bytes.ofString(haxe.Serializer.run(serialized)));
         });
 
@@ -134,10 +128,8 @@ class SerializerMacro
 
         // ADD COMPONENT TO ARRAY
         serialized.push(componentName);
-        // serialized[id] = componentName;
-        trace("hum : " + SerializerMacro.serialized);
 
-        trace("networkVariables " + networkVariables);
+        #if debug trace("networkVariables " + networkVariables); #end
 
         var inExprlist = [];
         var outExprlist = [];
@@ -151,9 +143,6 @@ class SerializerMacro
 
             var ein;
             var eout;
-
-            trace("varType " + varType);
-            trace("varName " + varNameIn + " / " + varNameOut);
 
             switch(varType)
             {
@@ -211,8 +200,7 @@ class SerializerMacro
 
         for(f in fields)
         {
-            trace("Serialized : " + new haxe.macro.Printer().printField(f));
-            // trace(f);
+            #if debug trace("Podstream class view : " + new haxe.macro.Printer().printField(f)); #end
         }
 
 
