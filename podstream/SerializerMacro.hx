@@ -109,9 +109,9 @@ class SerializerMacro
         }
 
 
-        ////////////////////////////////////////
-        // RETURN HERE PLEASE DONT FORGET HIM :'('
-        ////////////////////////////////////////
+        ////////////////////////////////////////////
+        // RETURN HERE PLEASE DONT FORGET HIM :'( //
+        ////////////////////////////////////////////
 
 
         // ADDS ID TO __ SERIALIZED __ OBJECT & CLASS
@@ -210,8 +210,6 @@ class SerializerMacro
     macro static public function build():Array<haxe.macro.Field>
     {
         var fields = Context.getBuildFields();
-
-
         fields = _build(fields);
 
         return fields;
