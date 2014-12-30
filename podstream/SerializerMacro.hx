@@ -25,10 +25,8 @@ class SerializerMacro
 
     static public function getSerialized():Array<String>
     {
+        // PODSTREAM SERIALIZATION + -HAXE- SERIALIZED
         var serializedSerialized:String = haxe.Resource.getString("serialized");
-        // TODO: Care about case where empty
-        // if(serializedSerialized == null)
-        //     serializedSerialized = [];
         return haxe.Unserializer.run(serializedSerialized);
     }
 
@@ -99,6 +97,11 @@ class SerializerMacro
                      meta: [], name: "__id", doc: null, pos: pos, access: [APublic, AStatic] });
 
         
+        haxe.macro.Context.onGenerate(function(types)
+        {
+            Context.addResource("serialized", haxe.io.Bytes.ofString(haxe.Serializer.run(serialized)));
+        });
+
         if(networkVariables.length == 0)
         {
             #if debug trace('No serialization for $componentName, abort'); #end
@@ -110,10 +113,6 @@ class SerializerMacro
         // RETURN HERE PLEASE DONT FORGET HIM :'('
         ////////////////////////////////////////
 
-        haxe.macro.Context.onGenerate(function(types)
-        {
-            Context.addResource("serialized", haxe.io.Bytes.ofString(haxe.Serializer.run(serialized)));
-        });
 
         // ADDS ID TO __ SERIALIZED __ OBJECT & CLASS
         var sid = getComponentSerializedId();

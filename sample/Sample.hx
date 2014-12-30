@@ -2,7 +2,7 @@
 class Position
 {
     @Short public var x:Float;
-    @Short public var y:Float;
+    public var y:Float;
 
     public function new(x:Float, y:Float)
     {
@@ -17,6 +17,8 @@ class Sample
 	public function new()
 	{
 		trace("hello");
+
+		trace(podstream.SerializerMacro.getSerialized());
 	}
 
 	static public function main()
