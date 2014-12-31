@@ -140,9 +140,6 @@ class SerializerMacro
             if(netVar.redirection != null) varNameIn = netVar.redirection;
             var varType = netVar.type;
 
-            var ein;
-            var eout;
-
             switch(varType)
             {
                 case "Short":
