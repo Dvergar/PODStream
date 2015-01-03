@@ -87,15 +87,12 @@ class SerializerMacro
         var id = getComponentId();
 
         // ADDS ID TO OBJECT & CLASS
+        // WORKAROUND: Since there is already _sid & __sid
+        // but useful when non-serializable objects ID are needed
+        var def = macro class {public var _id:Int = $v{id};
+                               public static var __id:Int = $v{id}};
+        fields = fields.concat(def.fields);
         #if debug trace("ID assigned: " + id); #end
-        fields.push({kind: FVar(TPath({name: "Int", pack: [], params: [] }),
-                                      {expr: EConst(CInt(Std.string(id))), pos : pos }),
-                     meta: [], name: "_id", doc: null, pos: pos, access: [APublic] });
-
-        fields.push({kind: FVar(TPath({name: "Int", pack: [], params: [] }),
-                                      {expr: EConst(CInt(Std.string(id))), pos : pos }),
-                     meta: [], name: "__id", doc: null, pos: pos, access: [APublic, AStatic] });
-
         
         haxe.macro.Context.onGenerate(function(types)
         {
@@ -116,13 +113,9 @@ class SerializerMacro
 
         // ADDS ID TO __ SERIALIZED __ OBJECT & CLASS
         var sid = getComponentSerializedId();
-        fields.push({kind: FVar(TPath({name: "Int", pack: [], params: [] }),
-                                      {expr: EConst(CInt(Std.string(sid))), pos : pos }),
-                     meta: [], name: "_sid", doc: null, pos: pos, access: [APublic] });
-
-        fields.push({kind: FVar(TPath({name: "Int", pack: [], params: [] }),
-                                      {expr: EConst(CInt(Std.string(sid))), pos : pos }),
-                     meta: [], name: "__sid", doc: null, pos: pos, access: [APublic, AStatic] });
+        var def = macro class {public var _sid:Int = $v{id};
+                               public static var __sid:Int = $v{id}};
+        fields = fields.concat(def.fields);
 
 
         // ADD COMPONENT TO ARRAY

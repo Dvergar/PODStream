@@ -1,0 +1,4 @@
+-main Sample
+-neko sample.n
+-cp ../.
+-cmd neko sample.n

@@ -30,6 +30,9 @@ class Sample
 		pos.x = 100;
 		pos.y = 100;
 
+		trace("pos _id: " + pos._id);
+		trace("pos _sid: " + pos._sid);
+
 		var bo = new haxe.io.BytesOutput();
 		pos.serialize(bo);
 
