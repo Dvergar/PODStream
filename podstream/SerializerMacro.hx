@@ -113,8 +113,8 @@ class SerializerMacro
 
         // ADDS ID TO __ SERIALIZED __ OBJECT & CLASS
         var sid = getComponentSerializedId();
-        var def = macro class {public var _sid:Int = $v{id};
-                               public static var __sid:Int = $v{id}};
+        var def = macro class {public var _sid:Int = $v{sid};
+                               public static var __sid:Int = $v{sid}};
         fields = fields.concat(def.fields);
 
 
