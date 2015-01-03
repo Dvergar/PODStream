@@ -157,35 +157,16 @@ class SerializerMacro
             }
         }
 
-        // IN
-        var arg = {name:"bi", type:null, opt:false, value:null};
 
-        var func = {args:[arg],
-                    ret:null,
-                    params:[],
-                    expr:{expr:EBlock(inExprlist), pos:pos}};
+        var serializationCls = macro class {
+            public function unserialize(bi)
+                $b{inExprlist};
+            public function serialize(bo)
+                $b{outExprlist};
+        };
 
-        fields.push({name: "unserialize",
-                     doc: null,
-                     meta: [],
-                     access: [APublic],
-                     kind: FFun(func),
-                     pos: pos});
+        fields = fields.concat(serializationCls.fields);
 
-        // OUT
-        var arg = {name:"bo", type:null, opt:false, value:null};
-
-        var func = {args:[arg],
-                    ret:null,
-                    params:[],
-                    expr:{expr:EBlock(outExprlist), pos:pos}};
-
-        fields.push({name: "serialize",
-                     doc: null,
-                     meta: [],
-                     access: [APublic],
-                     kind: FFun(func),
-                     pos: pos});
 
         for(f in fields)
         {
