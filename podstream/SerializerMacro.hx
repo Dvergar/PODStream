@@ -12,16 +12,10 @@ class SerializerMacro
     static public var serialized:Array<String> = new Array();
 
     static inline function getComponentId():Int
-    {
-        componentIds++;
-        return componentIds;
-    }
+        return ++componentIds;
 
     static inline function getComponentSerializedId():Int
-    {
-        componentSerializeIds++;
-        return componentSerializeIds;
-    }
+        return ++componentSerializeIds;
 
     static public function getSerialized():Array<String>
     {
@@ -38,7 +32,6 @@ class SerializerMacro
 
         // CONTEXT MIGHT NOT ALWAYS GIVE YOU THE RIGHT COMPONENT NAME
         // YOU CAN PASS THE COMPONENT NAME IN THAT CASE
-        var componentName = componentName;
         if(componentName == null) componentName = cls.name;
 
         #if debug trace("### PodStream Serialization: " + componentName + " ###"); #end
@@ -157,7 +150,6 @@ class SerializerMacro
             }
         }
 
-
         var serializationCls = macro class {
             public function unserialize(bi)
                 $b{inExprlist};
@@ -167,12 +159,8 @@ class SerializerMacro
 
         fields = fields.concat(serializationCls.fields);
 
-
         for(f in fields)
-        {
             #if debug trace("Podstream class view : " + new haxe.macro.Printer().printField(f)); #end
-        }
-
 
         return fields;
     }
