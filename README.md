@@ -131,4 +131,4 @@ Each serialized class will be assigned a unique public & static ID such as `myIn
 
 You can call `podstream.SerializerMacro.getSerialized()` from your application and get an Array of String of the types serialized.
 
-You can then use `Type.resolveClass(YourClass)` to resolve the type from the string returned if needed.
+You can then use `Type.resolveClass("YourClassName")` to resolve the type from the string returned if needed.
