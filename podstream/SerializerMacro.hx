@@ -7,15 +7,15 @@ typedef NetworkVariable = {name:String, type:String, redirection:String};
 
 class SerializerMacro
 {
-    static public var componentIds:Int = -1;
-    static public var componentSerializeIds:Int = -1;
+    static public var classIds:Int = -1;
+    static public var classSerializeIds:Int = -1;
     static public var serialized:Array<String> = new Array();
 
-    static inline function getComponentId():Int
-        return ++componentIds;
+    static inline function getClassId():Int
+        return ++classIds;
 
-    static inline function getComponentSerializedId():Int
-        return ++componentSerializeIds;
+    static inline function getClassSerializedId():Int
+        return ++classSerializeIds;
 
     static public function getSerialized():Array<String>
     {
@@ -25,16 +25,16 @@ class SerializerMacro
     }
 
     #if macro
-    static public function _build(fields:Array<Field>, ?componentName:String):Array<Field>
+    static public function _build(fields:Array<Field>, ?className:String):Array<Field>
     {
         var cls = Context.getLocalClass().get();
         var pos = Context.currentPos();
 
-        // CONTEXT MIGHT NOT ALWAYS GIVE YOU THE RIGHT COMPONENT NAME
-        // YOU CAN PASS THE COMPONENT NAME IN THAT CASE
-        if(componentName == null) componentName = cls.name;
+        // CONTEXT MIGHT NOT ALWAYS GIVE YOU THE RIGHT CLASS NAME
+        // YOU CAN PASS THE CLASS NAME IN THAT CASE
+        if(className == null) className = cls.name;
 
-        #if debug trace("### PodStream Serialization: " + componentName + " ###"); #end
+        #if debug trace("### PodStream Serialization: " + className + " ###"); #end
 
         // PROCESS EACH PARAMETER AND SAVE IT UP
         var networkVariables:Array<NetworkVariable> = new Array();
@@ -77,7 +77,7 @@ class SerializerMacro
         }
         
         // ASSIGN ID
-        var id = getComponentId();
+        var id = getClassId();
 
         // ADDS ID TO OBJECT & CLASS
         // WORKAROUND: Since there is already _sid & __sid
@@ -94,7 +94,7 @@ class SerializerMacro
 
         if(networkVariables.length == 0)
         {
-            #if debug trace('No serialization for $componentName, abort'); #end
+            #if debug trace('No serialization for $className, abort'); #end
             return fields;
         }
 
@@ -105,14 +105,14 @@ class SerializerMacro
 
 
         // ADDS ID TO __ SERIALIZED __ OBJECT & CLASS
-        var sid = getComponentSerializedId();
+        var sid = getClassSerializedId();
         var def = macro class {public var _sid:Int = $v{sid};
                                public static var __sid:Int = $v{sid}};
         fields = fields.concat(def.fields);
 
 
-        // ADD COMPONENT TO ARRAY
-        serialized.push(componentName);
+        // ADD CLASS TO ARRAY
+        serialized.push(className);
 
         #if debug trace("networkVariables " + networkVariables); #end
 
@@ -160,7 +160,9 @@ class SerializerMacro
         fields = fields.concat(serializationCls.fields);
 
         for(f in fields)
+        {
             #if debug trace("Podstream class view : " + new haxe.macro.Printer().printField(f)); #end
+        }
 
         return fields;
     }
