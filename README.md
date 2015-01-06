@@ -36,7 +36,7 @@ In the example above the haxe macro will generate two methods which will transfo
 class Position
 {
     public var _id:Int = 0;
-    public static var _id:Int = 0;
+    public static var __id:Int = 0;
     public var x:Float;
     public var y:Float;
 
@@ -97,7 +97,7 @@ will generate:
 class Position2
 {
     public var _id:Int = 1;
-    public static var _id:Int = 1;
+    public static var __id:Int = 1;
     public var x:Float;
     public var y:Float;
     public var netx:Float;
