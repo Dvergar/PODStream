@@ -142,7 +142,7 @@ class SerializerMacro
                     inExprlist.push( macro $i{varNameIn} = bi.readFloat() );
                 case "Bool":
                     outExprlist.push( macro ($i{varNameOut} == true) ? bo.writeByte(1) : bo.writeByte(0) );
-                    inExprlist.push( macro $i{varNameIn} = (bi.readByte() == 0) ? return false : return true );
+                    inExprlist.push( macro $i{varNameIn} = (bi.readByte() == 0) ? false : true );
                 case "String":
                     outExprlist.push( macro bo.writeInt16($i{varNameOut}.length) );
                     outExprlist.push( macro bo.writeString($i{varNameOut}) );
