@@ -1,7 +1,7 @@
 PODStream
 =========
 
-PODStream will serialize & deserialize your fields from/to a `ByteArray`.
+PODStream will serialize and deserialize your fields from/to a `ByteArray`.
 
 Given a position class such as:
 
@@ -129,6 +129,6 @@ Each serialized class will be assigned a unique public & static ID such as `myIn
 
 ## Serialization datas
 
-You can call `podstream.SerializerMacro.getSerialized()` from your application and get an Array<String> / of the types serialized.
+You can call `podstream.SerializerMacro.getSerialized()` from your application and get an `Array<String>` of the types serialized.
 
 You can then use `Type.resolveClass("YourClassName")` to resolve the type from the string returned if needed.
