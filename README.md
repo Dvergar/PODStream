@@ -1,7 +1,7 @@
 PODStream
 =========
 
-PODStream will serialize and deserialize your fields from/to a `ByteArray`..
+PODStream will serialize and deserialize your fields from/to `BytesInput` / `BytesOutput`.
 
 Given a position class such as:
 
