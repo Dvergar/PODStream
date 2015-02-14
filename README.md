@@ -62,7 +62,7 @@ class Position
 
 The library is used in two steps:
 * Mark your fields with the appropriate serialization
-* Pass your ByteArray around
+* Pass your `BytesInput` and `BytesOutput` around
 
 ## Redirections
 
