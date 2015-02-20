@@ -1,3 +1,5 @@
+import MyMacro;
+
 @:build(podstream.SerializerMacro.build())
 class Position
 {
@@ -15,6 +17,16 @@ class Vector
     @Short("nety") public var y:Float = 0;
     public var netx:Float;
     public var nety:Float;
+
+    public function new() {}
+}
+
+
+@:build(MyMacro.build())
+class Something
+{
+    public var z:Float;
+    @Entity public var test:Float;
 
     public function new() {}
 }

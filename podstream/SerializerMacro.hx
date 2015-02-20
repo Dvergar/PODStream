@@ -2,7 +2,13 @@ package podstream;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
-typedef NetworkVariable = {name:String, type:String, redirection:String};
+// typedef NetworkVariable = {name:String, type:String, redirection:String};
+typedef NetworkVariable = {name:String, type:NetworkType, redirection:String};
+typedef NetworkType = {
+    name:String,
+    unserialize:String->Array<Expr>,
+    serialize:String->Array<Expr>
+}
 
 
 class SerializerMacro
@@ -25,10 +31,76 @@ class SerializerMacro
     }
 
     #if macro
-    static public function _build(fields:Array<Field>, ?className:String):Array<Field>
+    static public function _build(fields:Array<Field>, ?customTypes:Array<NetworkType>, ?className:String):Array<Field>
     {
         var cls = Context.getLocalClass().get();
         var pos = Context.currentPos();
+
+        // NETWORK TYPES
+        if(customTypes == null) customTypes = [];
+        var networkTypes:Array<NetworkType> = [];
+        networkTypes = networkTypes.concat(customTypes);
+
+        networkTypes.push({
+            name:"Short",
+            serialize: function(varNameOut:String) {
+                return [macro bo.writeInt16(Std.int($i{varNameOut}))];
+            },
+            unserialize: function(varNameIn:String) {
+                return [macro $i{varNameIn} = bi.readInt16()];
+            }
+        });
+
+        networkTypes.push({
+            name:"Int",
+            serialize: function(varNameOut:String) {
+                return [macro bo.writeInt32(Std.int($i{varNameOut}))];
+            },
+            unserialize: function(varNameIn:String) {
+                return [macro $i{varNameIn} = bi.readInt32()];
+            }
+        });
+
+        networkTypes.push({
+            name:"Byte",
+            serialize: function(varNameOut:String) {
+                return [macro bo.writeByte(Std.int($i{varNameOut}))];
+            },
+            unserialize: function(varNameIn:String) {
+                return [macro $i{varNameIn} = bi.readByte()];
+            }
+        });
+
+        networkTypes.push({
+            name:"Float",
+            serialize: function(varNameOut:String) {
+                return [macro bo.writeByte(Std.int($i{varNameOut}))];
+            },
+            unserialize: function(varNameIn:String) {
+                return [macro $i{varNameIn} = bi.readByte()];
+            }
+        });
+
+        networkTypes.push({
+            name:"Bool",
+            serialize: function(varNameOut:String) {
+                return [macro bo.writeByte(Std.int($i{varNameOut}))];
+            },
+            unserialize: function(varNameIn:String) {
+                return [macro $i{varNameIn} = bi.readByte()];
+            }
+        });
+
+        networkTypes.push({
+            name:"String",
+            serialize: function(varNameOut:String) {
+                return [macro bo.writeInt16($i{varNameOut}.length),
+                        macro bo.writeString($i{varNameOut})];
+            },
+            unserialize: function(varNameIn:String) {
+                return [macro $i{varNameIn} = bi.readString(bi.readInt16())];
+            }
+        });
 
         // CONTEXT MIGHT NOT ALWAYS GIVE YOU THE RIGHT CLASS NAME
         // YOU CAN PASS THE CLASS NAME IN THAT CASE
@@ -45,33 +117,32 @@ class SerializerMacro
                 // META NET TYPES (can't be above because typemeta related to msgtypesmetas)
                 for(m in f.meta)
                 {
-                    if(m.name == "Short" ||
-                       m.name == "Int" ||
-                       m.name == "Float" ||
-                       m.name == "Bool" ||
-                       m.name == "Byte" ||
-                       m.name == "String")
+                    for(netType in networkTypes)
                     {
-                        var netVar:NetworkVariable = {name:f.name,
-                                                      type:m.name,
-                                                      redirection:null};
-
-                        if(m.params.length != 0)
+                        if(m.name == netType.name)
                         {
-                            switch(m.params[0].expr)
-                            {
-                                case EConst(CString(redirection)):
-                                    netVar.redirection = redirection;
-                                case _:
-                            }
-                        }
+                            var netVar:NetworkVariable = {name:f.name,
+                                                          type:netType,
+                                                          redirection:null};
 
-                        networkVariables.push(netVar);
+                            if(m.params.length != 0)
+                            {
+                                switch(m.params[0].expr)
+                                {
+                                    case EConst(CString(redirection)):
+                                        netVar.redirection = redirection;
+                                    case _:
+                                }
+                            }
+
+                            networkVariables.push(netVar);
+                        }
+                        else
+                        {
+                            trace("Not a network type : " + m.name, pos);
+                        }
                     }
-                    else
-                    {
-                        Context.error("Not a network type : " + m.name, pos);
-                    }
+
                 }
             }
         }
@@ -116,8 +187,8 @@ class SerializerMacro
 
         #if debug trace("networkVariables " + networkVariables); #end
 
-        var inExprlist = [];
-        var outExprlist = [];
+        var inExprlist:Array<Expr> = [];
+        var outExprlist:Array<Expr> = [];
 
         for(netVar in networkVariables)
         {
@@ -126,28 +197,8 @@ class SerializerMacro
             if(netVar.redirection != null) varNameIn = netVar.redirection;
             var varType = netVar.type;
 
-            switch(varType)
-            {
-                case "Short":
-                    outExprlist.push( macro bo.writeInt16(Std.int($i{varNameOut})) );
-                    inExprlist.push( macro $i{varNameIn} = bi.readInt16() );
-                case "Int":
-                    outExprlist.push( macro bo.writeInt32(Std.int($i{varNameOut})) );
-                    inExprlist.push( macro $i{varNameIn} = bi.readInt32() );
-                case "Byte":
-                    outExprlist.push( macro bo.writeByte(Std.int($i{varNameOut})) );
-                    inExprlist.push( macro $i{varNameIn} = bi.readByte() );
-                case "Float":
-                    outExprlist.push( macro bo.writeFloat($i{varNameOut}) );
-                    inExprlist.push( macro $i{varNameIn} = bi.readFloat() );
-                case "Bool":
-                    outExprlist.push( macro ($i{varNameOut} == true) ? bo.writeByte(1) : bo.writeByte(0) );
-                    inExprlist.push( macro $i{varNameIn} = (bi.readByte() == 0) ? false : true );
-                case "String":
-                    outExprlist.push( macro bo.writeInt16($i{varNameOut}.length) );
-                    outExprlist.push( macro bo.writeString($i{varNameOut}) );
-                    inExprlist.push( macro $i{varNameIn} = bi.readString(bi.readInt16()) );
-            }
+            outExprlist = outExprlist.concat(netVar.type.serialize(varNameOut));
+            inExprlist = inExprlist.concat(netVar.type.unserialize(varNameIn));
         }
 
         var serializationCls = macro class {
