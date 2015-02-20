@@ -84,10 +84,10 @@ class SerializerMacro
         networkTypes.push({
             name:"Bool",
             serialize: function(varNameOut:String) {
-                return [macro bo.writeByte(Std.int($i{varNameOut}))];
+                return [macro ($i{varNameOut} == true) ? bo.writeByte(1) : bo.writeByte(0)];
             },
             unserialize: function(varNameIn:String) {
-                return [macro $i{varNameIn} = bi.readByte()];
+                return [macro $i{varNameIn} = (bi.readByte() == 0) ? false : true];
             }
         });
 
@@ -137,12 +137,7 @@ class SerializerMacro
 
                             networkVariables.push(netVar);
                         }
-                        else
-                        {
-                            trace("Not a network type : " + m.name, pos);
-                        }
                     }
-
                 }
             }
         }
@@ -199,6 +194,8 @@ class SerializerMacro
 
             outExprlist = outExprlist.concat(netVar.type.serialize(varNameOut));
             inExprlist = inExprlist.concat(netVar.type.unserialize(varNameIn));
+            // outExprlist = netVar.type.serialize(varNameOut);
+            // inExprlist = netVar.type.unserialize(varNameIn);
         }
 
         var serializationCls = macro class {
