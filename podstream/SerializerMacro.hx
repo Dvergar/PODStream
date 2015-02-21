@@ -44,61 +44,61 @@ class SerializerMacro
         networkTypes.push({
             name:"Short",
             serialize: function(varNameOut:String) {
-                return [macro bo.writeInt16(Std.int($i{varNameOut}))];
+                return [ macro bo.writeInt16(Std.int($i{varNameOut})) ];
             },
             unserialize: function(varNameIn:String) {
-                return [macro $i{varNameIn} = bi.readInt16()];
+                return [ macro $i{varNameIn} = bi.readInt16() ];
             }
         });
 
         networkTypes.push({
             name:"Int",
             serialize: function(varNameOut:String) {
-                return [macro bo.writeInt32(Std.int($i{varNameOut}))];
+                return [ macro bo.writeInt32(Std.int($i{varNameOut})) ];
             },
             unserialize: function(varNameIn:String) {
-                return [macro $i{varNameIn} = bi.readInt32()];
+                return [ macro $i{varNameIn} = bi.readInt32() ];
             }
         });
 
         networkTypes.push({
             name:"Byte",
             serialize: function(varNameOut:String) {
-                return [macro bo.writeByte(Std.int($i{varNameOut}))];
+                return [ macro bo.writeByte(Std.int($i{varNameOut})) ];
             },
             unserialize: function(varNameIn:String) {
-                return [macro $i{varNameIn} = bi.readByte()];
+                return [ macro $i{varNameIn} = bi.readByte() ];
             }
         });
 
         networkTypes.push({
             name:"Float",
             serialize: function(varNameOut:String) {
-                return [macro bo.writeByte(Std.int($i{varNameOut}))];
+                return [ macro bo.writeFloat($i{varNameOut}) ];
             },
             unserialize: function(varNameIn:String) {
-                return [macro $i{varNameIn} = bi.readByte()];
+                return [ macro $i{varNameIn} = bi.readFloat() ];
             }
         });
 
         networkTypes.push({
             name:"Bool",
             serialize: function(varNameOut:String) {
-                return [macro ($i{varNameOut} == true) ? bo.writeByte(1) : bo.writeByte(0)];
+                return [ macro ($i{varNameOut} == true) ? bo.writeByte(1) : bo.writeByte(0) ];
             },
             unserialize: function(varNameIn:String) {
-                return [macro $i{varNameIn} = (bi.readByte() == 0) ? false : true];
+                return [ macro $i{varNameIn} = (bi.readByte() == 0) ? false : true ];
             }
         });
 
         networkTypes.push({
             name:"String",
             serialize: function(varNameOut:String) {
-                return [macro bo.writeInt16($i{varNameOut}.length),
-                        macro bo.writeString($i{varNameOut})];
+                return [ macro bo.writeInt16($i{varNameOut}.length),
+                         macro bo.writeString($i{varNameOut}) ];
             },
             unserialize: function(varNameIn:String) {
-                return [macro $i{varNameIn} = bi.readString(bi.readInt16())];
+                return [ macro $i{varNameIn} = bi.readString(bi.readInt16()) ];
             }
         });
 
@@ -201,7 +201,7 @@ class SerializerMacro
         var serializationCls = macro class {
             public function unserialize(bi)
                 $b{inExprlist};
-            public function serialize(bo)
+            public function serialize(bo:haxe.io.BytesOutput)
                 $b{outExprlist};
         };
 
