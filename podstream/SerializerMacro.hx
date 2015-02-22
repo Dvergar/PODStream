@@ -160,22 +160,15 @@ class SerializerMacro
 
         if(networkVariables.length == 0)
         {
-            #if debug trace('No serialization for $className, abort'); #end
-            return fields;
+            #if debug trace('No serialization for $className'); #end
         }
 
-
-        ////////////////////////////////////////////
-        // RETURN HERE PLEASE DONT FORGET HIM :'( //
-        ////////////////////////////////////////////
-
-
         // ADDS ID TO __ SERIALIZED __ OBJECT & CLASS
-        var sid = getClassSerializedId();
+        var sid = -1;
+        if(networkVariables.length > 0 ) sid = getClassSerializedId();
         var def = macro class {public var _sid:Int = $v{sid};
                                public static var __sid:Int = $v{sid}};
         fields = fields.concat(def.fields);
-
 
         // ADD CLASS TO ARRAY
         serialized.push(className);
@@ -194,8 +187,6 @@ class SerializerMacro
 
             outExprlist = outExprlist.concat(netVar.type.serialize(varNameOut));
             inExprlist = inExprlist.concat(netVar.type.unserialize(varNameIn));
-            // outExprlist = netVar.type.serialize(varNameOut);
-            // inExprlist = netVar.type.unserialize(varNameIn);
         }
 
         var serializationCls = macro class {

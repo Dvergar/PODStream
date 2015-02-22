@@ -31,6 +31,14 @@ class Something
     public function new() {}
 }
 
+@:build(MyMacro.build())
+class Nothing
+{
+    public var hoho:Float;
+
+    public function new() {}
+}
+
 
 class Sample
 {
