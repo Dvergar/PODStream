@@ -27,7 +27,10 @@ class SerializerMacro
     {
         // PODSTREAM SERIALIZATION + -HAXE- SERIALIZED
         var serializedSerialized:String = haxe.Resource.getString("serialized");
-        return haxe.Unserializer.run(serializedSerialized);
+        var unserializedSerialized = new Array<String>();
+        if(serializedSerialized != null)  // PREVENT ERROR WHEN NO SERIALIZATION
+            unserializedSerialized = haxe.Unserializer.run(serializedSerialized);
+        return unserializedSerialized;
     }
 
     #if macro
