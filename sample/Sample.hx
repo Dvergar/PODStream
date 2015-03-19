@@ -31,10 +31,14 @@ class Something
     public function new() {}
 }
 
+
+class MyObject {}
+
+
 @:build(MyMacro.build())
 class Nothing
 {
-    public var hoho:Float;
+    @MyObject public var hoho:MyObject;
 
     public function new() {}
 }
@@ -91,6 +95,10 @@ class Sample
 		trace("vec2.y: " + vec2.y); // default
 		trace("vec2.netx: " + vec2.netx); // serialized from x to netx
 		trace("vec2.nety: " + vec2.nety); // serialized from y to nety
+
+		// CUSTOM NETWORK TYPE
+		var nothing = new Nothing();
+		nothing.unserialize(bi);
 	}
 
 	static public function main()

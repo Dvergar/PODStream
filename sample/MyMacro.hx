@@ -9,9 +9,9 @@ class MyMacro
         var fields = Context.getBuildFields();
 
         var EntityType = {
-            name:"Entity",
+            name:"MyObject",
             serialize: function(varNameOut:String) {
-                return [macro trace("lol")];
+                return [macro trace("serialize")];
             },
             unserialize: function(varNameIn:String) {
                 return [macro trace("unserialize")];
