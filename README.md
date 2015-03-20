@@ -125,7 +125,7 @@ class Position2
 
 ## ID generation
 
-Each serialized class will be assigned a unique public & static ID such as `myInstance._id` and `MyClass.__id`.
+Each class will be assigned a unique public & static ID such as `myInstance._id` and `MyClass.__id`.
 
 ## Serialization datas
 
