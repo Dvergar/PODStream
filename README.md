@@ -22,13 +22,15 @@ class Position
 
 You can prefix your fields with:
 * `@Short`
+* `@UShort`
 * `@Int`
 * `@Float`
 * `@Bool`
 * `@Byte`
 * `@String`
-
-Note: Arrays are not supported.
+* `@Int32Array`
+* `@Float32Array`
+* `@StringArray`
 
 In the example above the haxe macro will generate two methods which will transform your class to:
 
