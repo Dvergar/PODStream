@@ -45,6 +45,16 @@ class SerializerMacro
         networkTypes = networkTypes.concat(customTypes);
 
         networkTypes.push({
+            name:"UShort",
+            serialize: function(varNameOut:String) {
+                return [ macro bo.writeUInt16(Std.int($i{varNameOut})) ];
+            },
+            unserialize: function(varNameIn:String) {
+                return [ macro $i{varNameIn} = bi.readUInt16() ];
+            }
+        });
+
+        networkTypes.push({
             name:"Short",
             serialize: function(varNameOut:String) {
                 return [ macro bo.writeInt16(Std.int($i{varNameOut})) ];
@@ -102,6 +112,39 @@ class SerializerMacro
             },
             unserialize: function(varNameIn:String) {
                 return [ macro $i{varNameIn} = bi.readString(bi.readInt16()) ];
+            }
+        });
+
+        networkTypes.push({
+            name:"Int32Array",
+            serialize: function(varNameOut:String) {
+                return [ macro bo.writeInt32($i{varNameOut}.length),
+                         macro for(i in 0...$i{varNameOut}.length) bo.writeInt32($i{varNameOut}[i]) ];
+            },
+            unserialize: function(varNameIn:String) {
+                return [ macro $i{varNameIn} = [for (i in 0...bi.readInt32()) bi.readInt32()]];
+            }
+        });
+
+        networkTypes.push({
+            name:"Float32Array",
+            serialize: function(varNameOut:String) {
+                return [ macro bo.writeInt32($i{varNameOut}.length),
+                         macro for(i in 0...$i{varNameOut}.length) bo.writeFloat($i{varNameOut}[i]) ];
+            },
+            unserialize: function(varNameIn:String) {
+                return [ macro $i{varNameIn} = [for (i in 0...bi.readInt32()) bi.readFloat()]];
+            }
+        });
+
+        networkTypes.push({
+            name:"StringArray",
+            serialize: function(varNameOut:String) {
+                return [ macro bo.writeInt32($i{varNameOut}.length),
+                         macro for(i in 0...$i{varNameOut}.length) { bo.writeInt16($i{varNameOut}[i].length); bo.writeString($i{varNameOut}[i]); } ];
+            },
+            unserialize: function(varNameIn:String) {
+                return [ macro $i{varNameIn} = [for (i in 0...bi.readInt32()) bi.readString(bi.readInt16()) ]];
             }
         });
 
