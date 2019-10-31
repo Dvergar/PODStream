@@ -185,7 +185,6 @@ class SerializerMacro {
 									case _:
 								}
 							}
-
 							networkVariables.push(netVar);
 						}
 					}
@@ -229,7 +228,7 @@ class SerializerMacro {
 		fields = fields.concat(def.fields);
 
 		// ADD CLASS TO ARRAY
-		serialized.push(className);
+		serialized.push(Context.getLocalClass().toString());
 
 		// #if debug trace("networkVariables " + networkVariables); #end
 
@@ -258,7 +257,9 @@ class SerializerMacro {
 		fields = fields.concat(serializationCls.fields);
 
 		for (f in fields) {
-			// #if debug trace("Podstream class view : " + new haxe.macro.Printer().printField(f)); #end
+			#if debug
+			// trace("Podstream class view : " + new haxe.macro.Printer().printField(f));
+			#end
 		}
 
 		return fields;
